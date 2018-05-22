@@ -1,0 +1,118 @@
+;****************************************************************************
+; EntryPoint
+; Where the program starts.
+;****************************************************************************
+
+EntryPoint:
+    move.w  #$2700, sr                  ; Disable interrupts
+    
+    move.b  (HwVersion), d7             ; Disable TMSS
+    and.b   #$0F, d7
+    beq.s   @NoTmss
+    move.l  #'SEGA', (TmssPort)
+@NoTmss:
+    
+    jsr     (InitVideo).w               ; Set up system
+    
+    moveq   #4, d7                      ; Write title
+    moveq   #2, d6
+    lea     (TextTitle), a6
+    jsr     (WriteText).w
+
+;----------------------------------------------------------------------------
+
+    moveq   #6, d7                      ; Write "VERSION IS"
+    moveq   #6, d6
+    lea     (TextVersionIs), a6
+    jsr     (WriteText).w
+    
+    lea     (VersionBuf), a6            ; Get version and convert the
+    move.b  (HwVersion), d0             ; number into an ASCII string
+    and.b   #$0F, d0
+    cmp.b   #10, d0
+    blo.s   @NoTens
+    move.b  #'1', (a6)+
+    sub.b   #10, d0
+@NoTens:
+    add.b   #'0', d0
+    move.b  d0, (a6)+
+    move.b  #0, (a6)+
+    
+    moveq   #17, d7                     ; Write version
+    moveq   #6, d6
+    lea     (VersionBuf), a6
+    jsr     (WriteText).w
+
+;----------------------------------------------------------------------------
+
+    moveq   #6, d7                      ; Write "REGION IS"
+    moveq   #8, d6
+    lea     (TextRegionIs), a6
+    jsr     (WriteText).w
+    
+    move.b  (HwVersion), d0             ; Get region name
+    lsr.w   #4, d0
+    and.w   #3<<2, d0
+    lea     (RegionList), a6
+    move.l  (a6,d0.w), a6
+    
+    moveq   #16, d7                     ; Write region name
+    moveq   #8, d6
+    jsr     (WriteText).w
+
+;----------------------------------------------------------------------------
+
+    lea     (TextNoSegaCD), a6          ; Check if there's a Sega CD
+    btst    #5, (HwVersion)
+    bne.s   @NoSegaCD
+    lea     (TextHasSegaCD), a6
+@NoSegaCD:
+    
+    moveq   #6, d7                      ; Write the result
+    moveq   #10, d6
+    jsr     (WriteText).w
+
+;----------------------------------------------------------------------------
+
+    lea     (TextNo32X), a6             ; Check if there's a 32X
+    cmpi.l  #'MARS', (MarsCheck)
+    bne.s   @No32X
+    lea     (TextHas32X), a6
+@No32X:
+    
+    moveq   #6, d7                      ; Write the result
+    moveq   #12, d6
+    jsr     (WriteText).w
+
+;****************************************************************************
+
+MainLoop:
+    jsr     (NextFrame).w               ; Wait until next frame
+    bra     MainLoop
+
+;****************************************************************************
+; NextFrame
+; Waits until the next frame and updates the system state.
+;----------------------------------------------------------------------------
+; breaks ........ all
+;****************************************************************************
+
+NextFrame:
+    jsr     (Vsync).w                   ; Wait for next vblank
+    move.w  #VDPREG_MODE2|$64,(VdpCtrl) ; Turn on display
+    
+    rts                                 ; End of subroutine
+
+;****************************************************************************
+; ErrorInt
+; Handler for when the program crashes.
+;****************************************************************************
+
+ErrorInt:
+    move.w  #$2700, sr                  ; Disable interrupts
+    
+    move.w  #VDPREG_BGCOLOR|$00, (VdpCtrl)  ; Tint the screen red
+    move.l  #$C0000000, (VdpCtrl)
+    move.w  #$000E, (VdpData)
+    
+    bra.s   *                           ; Hang up forever

@@ -1,0 +1,6 @@
+input "font.png"
+output "font.4bpp"
+tiles 1 0 9 1
+tiles 0 1 10 1
+tiles 0 2 10 1
+tiles 0 3 8 1

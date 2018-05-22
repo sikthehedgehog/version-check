@@ -1,0 +1,33 @@
+;****************************************************************************
+; Text that shows up on screen
+;****************************************************************************
+
+TextTitle:          dc.b 'VERSION CHECK',0
+TextVersionIs:      dc.b 'VERSION IS',0
+TextRegionIs:       dc.b 'REGION IS',0
+TextJapan:          dc.b 'JAPAN',0
+TextAmerica:        dc.b 'AMERICA',0
+TextEurope:         dc.b 'EUROPE',0
+TextInvalid:        dc.b 'INVALID',0
+TextNoSegaCD:       dc.b 'NO SEGA CD',0
+TextHasSegaCD:      dc.b 'SEGA CD PRESENT',0
+TextNo32X:          dc.b 'NO 32X',0
+TextHas32X:         dc.b '32X PRESENT',0
+                    even
+
+;****************************************************************************
+; List of names for every region
+;****************************************************************************
+
+RegionList:
+    dc.l    TextJapan
+    dc.l    TextInvalid
+    dc.l    TextAmerica
+    dc.l    TextEurope
+
+;****************************************************************************
+; Graphics for the font
+;****************************************************************************
+
+FontGfx:
+    incbin  "font.4bpp"

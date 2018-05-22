@@ -1,0 +1,17 @@
+;****************************************************************************
+; Hardware port addresses
+;****************************************************************************
+
+HwVersion           equ $A10001         ; Console region and version
+TmssPort            equ $A14000         ; Write "SEGA" to disable TMSS
+
+VdpCtrl             equ $C00004         ; VDP control port
+VdpData             equ $C00000         ; VDP data port
+HvCounter           equ $C00008         ; HV counter
+
+IoCtrl1             equ $A10009         ; I/O control port 1P
+IoCtrl2             equ $A1000B         ; I/O control port 2P
+IoData1             equ $A10003         ; I/O data port 1P
+IoData2             equ $A10005         ; I/O data port 2P
+
+MarsCheck           equ $A130EC         ; 32X register that has "MARS"

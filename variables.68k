@@ -1,0 +1,7 @@
+;****************************************************************************
+; Program variables
+;****************************************************************************
+
+                    rsset $FF0000
+VersionBuf          rs.b 3              ; Buffer to store the version string
+VBlankFlag          rs.b 1              ; Flag used to sync with vblank
